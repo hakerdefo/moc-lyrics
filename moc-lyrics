@@ -1,0 +1,24 @@
+#!/bin/sh
+
+MOCSTATE=$(pgrep mocp)
+
+if [[ -z "$MOCSTATE" ]]; then
+echo "MOC Is Not Running!"
+exit
+fi
+
+SONGTITLE=$(mocp -i | grep 'SongTitle:' | sed -e 's/^.*: //');
+ARTIST=$(mocp -i | grep 'Artist:' | sed -e 's/^.*: //');
+ALBUM=$(mocp -i | grep 'Album:' | sed -e 's/^.*: //');
+
+if [[ -z "$SONGTITLE" ]]; then
+echo "MOC Is Not Playing Anything!"
+
+else
+
+title=$(echo "$SONGTITLE" | perl -MURI::Escape -ne 'chomp;print uri_escape($_),"\n"')
+artist=$(echo "$ARTIST" | perl -MURI::Escape -ne 'chomp;print uri_escape($_),"\n"')
+song=$(curl -s "http://makeitpersonal.co/lyrics?artist=$artist&title=$title")
+
+printf "$SONGTITLE - $ARTIST - $ALBUM\n$song" | less
+fi
