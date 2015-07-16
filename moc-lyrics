@@ -1,11 +1,13 @@
-#!/bin/sh
+#!/bin/bash
 
 MOCSTATE=$(pgrep mocp)
 
 if [[ -z "$MOCSTATE" ]]; then
 echo "MOC Is Not Running!"
-exit
-fi
+
+exit 1
+
+else
 
 SONGTITLE=$(mocp -i | grep 'SongTitle:' | sed -e 's/^.*: //');
 ARTIST=$(mocp -i | grep 'Artist:' | sed -e 's/^.*: //');
@@ -21,4 +23,8 @@ artist=$(echo "$ARTIST" | perl -MURI::Escape -ne 'chomp;print uri_escape($_),"\n
 song=$(curl -s "http://makeitpersonal.co/lyrics?artist=$artist&title=$title")
 
 printf "$SONGTITLE - $ARTIST - $ALBUM\n$song" | less
+
 fi
+fi
+
+exit 0
