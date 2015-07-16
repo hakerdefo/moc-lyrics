@@ -1,9 +1,22 @@
 #!/bin/bash
 
+if ! type mocp >/dev/null 2>&1; then
+
+echo ""
+echo "MOC Is Not Installed!"
+echo ""
+
+exit 1
+
+else
+
 MOCSTATE=$(pgrep mocp)
 
 if [[ -z "$MOCSTATE" ]]; then
+
+echo ""
 echo "MOC Is Not Running!"
+echo ""
 
 exit 1
 
@@ -14,16 +27,20 @@ ARTIST=$(mocp -i | grep 'Artist:' | sed -e 's/^.*: //');
 ALBUM=$(mocp -i | grep 'Album:' | sed -e 's/^.*: //');
 
 if [[ -z "$SONGTITLE" ]]; then
+
+echo ""
 echo "MOC Is Not Playing Anything!"
+echo ""
 
 else
 
 title=$(echo "$SONGTITLE" | perl -MURI::Escape -ne 'chomp;print uri_escape($_),"\n"')
 artist=$(echo "$ARTIST" | perl -MURI::Escape -ne 'chomp;print uri_escape($_),"\n"')
-song=$(curl -s "http://makeitpersonal.co/lyrics?artist=$artist&title=$title")
+song=$(curl -s --connect-timeout 30 "http://makeitpersonal.co/lyrics?artist=$artist&title=$title")
 
 printf "$SONGTITLE - $ARTIST - $ALBUM\n$song" | less
 
+fi
 fi
 fi
 
