@@ -1,133 +1,274 @@
 #!/usr/bin/env bash
 
-if ! type mocp >/dev/null 2>&1; then
+function moc_test (){
 
-printf "\033c"
-echo ""
-echo "MOC Is Not Installed!"
-echo ""
-echo "MOC Is An Amazing Console Audio Player!"
-echo "Please Install MOC Using Your Package-manager!"
-echo ""
+    if ! type mocp >/dev/null 2>&1; then
 
-exit 1
+        printf "\033c"
+        echo ""
+        echo "MOC Is Not Installed!"
+        echo ""
+        echo "MOC Is An Amazing Console Audio Player!"
+        echo "Please Install MOC Using Your Package-manager!"
+        echo ""
 
-else
+        exit_moc_lyrics
 
-MOCSTATE=$(pgrep mocp)
+    else
 
-if [[ -z "$MOCSTATE" ]]; then
+        moc_check
 
-printf "\033c"
-echo ""
-echo "MOC Is Not Running!"
-echo "To Start MOC, type \"mocp\" In Your Terminal!"
-echo ""
+    fi
 
-exit 1
+}
 
-else
+function exit_moc_lyrics (){
 
-SONGTITLE=$(mocp -i | grep 'SongTitle:' | sed -e 's/^.*: //');
-ARTIST=$(mocp -i | grep 'Artist:' | sed -e 's/^.*: //');
-ALBUM=$(mocp -i | grep 'Album:' | sed -e 's/^.*: //');
+    WORK_DIRECTORY="/tmp/moc_lyrics/"
 
-if [[ -z "$SONGTITLE" ]]; then
+    if [ -d "$WORK_DIRECTORY" ]; then
 
-printf "\033c"
-echo ""
-echo "MOC Is Not Playing Anything!"
-echo ""
+        rm -r "$WORK_DIRECTORY"
 
-exit 1
+    fi
 
-else
+    exit
 
-if ! type perl >/dev/null 2>&1; then
+}
 
-printf "\033c"
-echo ""
-echo "Perl Is Not Installed!"
-echo ""
-echo "Perl Is A Required Dependency!"
-echo "Please Install Perl Using Your Package-manager!"
-echo ""
+function moc_check (){
 
-exit 1
+    MOCSTATE=$(pgrep mocp)
 
-else
+    if [[ -z "$MOCSTATE" ]]; then
 
-perl -MURI::Escape -e 'print "$URI::Escape::VERSION\n";' &> /dev/null
+        printf "\033c"
+        echo ""
+        echo "MOC Is Not Running!"
+        echo "To Start MOC, type \"mocp\" In Your Terminal!"
+        echo ""
 
-RETVAL=$?
+        exit_moc_lyrics
 
-if [ "$RETVAL" -ne 0 ]; then
+    else
 
-printf "\033c"
-echo ""
-echo "Perl Module \"URI::Escape\" Is Not Installed!"
-echo ""
-echo "Module \"URI::Escape\" Is A Required Dependency!"
-echo "Please Open The Following Link For More Info,"
-echo ""
-echo -e '\e[38;5;82m'"http://stackoverflow.com/q/65865"
-echo ""
-tput sgr0
+        moc_status
 
-exit 1
+    fi
 
-else
+}
 
-if ! type wget >/dev/null 2>&1; then
+function moc_status (){
 
-printf "\033c"
-echo ""
-echo "Wget Is Not Installed!"
-echo "Please Install Wget Using Your Package-manager!"
-echo ""
+    MO_ST=$(mocp -i 2>/dev/null | grep "STOP")
 
-exit 1
+    if [[ -n "$MO_ST" ]]; then
 
-else
+        printf "\033c"
+        echo ""
+        echo "MOC Is Not Playing Anything!"
+        echo ""
 
-if [[ `wget -S --spider "https://makeitpersonal.co" 2>&1 | grep 'HTTP/1.1 200 OK'` ]]; then
+        exit_moc_lyrics
 
-printf "\033c"
-title=$(echo "$SONGTITLE" | perl -MURI::Escape -ne 'chomp;print uri_escape($_),"\n"')
-artist=$(echo "$ARTIST" | perl -MURI::Escape -ne 'chomp;print uri_escape($_),"\n"')
-song=$(wget --user-agent="Mozilla/5.0 Gecko/20100101" --no-check-certificate --quiet --timeout=30 -O - "https://makeitpersonal.co/lyrics?artist=$artist&title=$title")
+    else
 
-printf "$SONGTITLE - $ARTIST - $ALBUM\n$song" | less
-printf "\033c"
+        perl_check
 
-exit 0
+    fi
 
-else
+}
 
-printf "\033c"
-echo ""
-echo "Can Not Connect To The Site \"makeitpersonal\"!"
-echo "Make Sure Your Internet Connection Is Active!"
-echo "If The Problem Persists You Can Report It At,"
-echo "GitHub repository of the project by creating,"
-echo "An Issue There. Here Is The Link To The Repo,"
-echo ""
-echo -e '\e[38;5;82m'"https://github.com/hakerdefo/moc-lyrics"
-echo ""
-tput sgr0
-echo "If you don't use GitHub you can report it by,"
-echo "emailing the author at the following address,"
-echo ""
-echo -e '\e[38;5;82m'"hakerdefo (at) gmail (dot) com"
-echo ""
-tput sgr0
+function perl_check (){
 
-exit 1
+    if ! type perl >/dev/null 2>&1; then
 
-fi
-fi
-fi
-fi
-fi
-fi
-fi
+        printf "\033c"
+        echo ""
+        echo "Perl Is Not Installed!"
+        echo ""
+        echo "Perl Is A Required Dependency!"
+        echo "Please Install Perl Using Your Package-manager!"
+        echo ""
+
+        exit_moc_lyrics
+
+    fi
+
+    perl -MURI::Escape -e 'print "$URI::Escape::VERSION\n";' &> /dev/null
+
+    RETVAL=$?
+
+    if [ "$RETVAL" -ne 0 ]; then
+
+        printf "\033c"
+        echo ""
+        echo "Perl Module \"URI::Escape\" Is Not Installed!"
+        echo ""
+        echo "Module \"URI::Escape\" Is A Required Dependency!"
+        echo "Please Open The Following Link For More Info,"
+        echo ""
+        echo -e '\e[38;5;82m'"http://stackoverflow.com/q/65865"
+        echo ""
+        tput sgr0
+
+        exit_moc_lyrics
+
+    else
+
+        wget_check
+
+    fi
+
+}
+
+function wget_check (){
+
+    if ! type wget >/dev/null 2>&1; then
+
+        printf "\033c"
+        echo ""
+        echo "Wget Is Not Installed!"
+        echo "Please Install Wget Using Your Package-manager!"
+        echo ""
+
+        exit_moc_lyrics
+
+    else
+
+        tag_check
+
+    fi
+
+}
+
+function tag_check (){
+
+    TITLE=$(mocp -i | grep 'SongTitle:' | sed -e 's/^.*: //')
+
+    if [[ -z "$TITLE" ]]; then
+
+        printf "\033c"
+
+        echo ""
+        echo "MOC can't get the title field from the file metadata!"
+        echo "More information on this subject can be obtained here,"
+        echo -e '\e[38;5;82m'"https://en.wikipedia.org/wiki/ID3"
+        echo -e '\e[38;5;82m'"https://en.wikipedia.org/wiki/Tag_editor"
+        echo ""
+        tput sgr0
+
+        exit_moc_lyrics
+
+    fi
+
+    ARTIST=$(mocp -i | grep 'Artist:' | sed -e 's/^.*: //')
+
+    if [[ -z "$ARTIST" ]]; then
+
+        printf "\033c"
+
+        echo ""
+        echo "MOC can't get the artist field from the file metadata!"
+        echo "More information on this subject can be obtained here,"
+        echo -e '\e[38;5;82m'"https://en.wikipedia.org/wiki/ID3"
+        echo -e '\e[38;5;82m'"https://en.wikipedia.org/wiki/Tag_editor"
+        echo ""
+        tput sgr0
+
+        exit_moc_lyrics
+
+    else
+
+        link_check
+
+    fi
+
+}
+
+function link_check (){
+
+    if wget --spider --user-agent="Mozilla/5.0 Gecko/20100101" --no-check-certificate --quiet --timeout=30 -q "https://makeitpersonal.co" -O /dev/null; then
+
+        get_lyrics
+
+    else
+
+        printf "\033c"
+        echo ""
+        echo "Can Not Connect To The Site \"makeitpersonal\"!"
+        echo "Make Sure Your Internet Connection Is Active!"
+        echo "If The Problem Persists You Can Report It At,"
+        echo "GitHub Repository Of The Project By Creating,"
+        echo "An Issue There. Here Is The Link To The Repo,"
+        echo ""
+        echo -e '\e[38;5;82m'"https://github.com/hakerdefo/moc-lyrics"
+        echo ""
+        tput sgr0
+        echo "If You Don't Use GitHub You Can Report It By,"
+        echo "Emailing The Author At The Following Address,"
+        echo ""
+        echo -e '\e[38;5;82m'"hakerdefo (at) gmail (dot) com"
+        echo ""
+        tput sgr0
+
+        exit_moc_lyrics
+
+    fi
+
+}
+
+function get_lyrics (){
+
+    WORK_DIRECTORY="/tmp/moc_lyrics/"
+    test -d "$WORK_DIRECTORY" || mkdir -p "$WORK_DIRECTORY"
+    ARTIST1=$(mocp -i | grep 'Artist:' | sed -e 's/^.*: //')
+    TITLE1=$(mocp -i | grep 'SongTitle:' | sed -e 's/^.*: //')
+    ARTIST2=$(echo "$ARTIST1" | perl -MURI::Escape -ne 'chomp;print uri_escape($_),"\n"')
+    TITLE2=$(echo "$TITLE1" | perl -MURI::Escape -ne 'chomp;print uri_escape($_),"\n"')
+    FILE_HASH=$(echo -n "$TITLE1$ARTIST1" | base32)
+    FILE_HASH2=$(echo -n "$FILE_HASH" | sha256sum | awk '{print $1}')
+    LYRIC_FILE="$WORK_DIRECTORY/$FILE_HASH2"
+
+    if [ ! -f "$LYRIC_FILE" ]; then
+        
+        wget --user-agent="Mozilla/5.0 Gecko/20100101" --no-check-certificate --quiet --timeout=30 -O "$LYRIC_FILE" "https://makeitpersonal.co/lyrics?artist=$ARTIST2&title=$TITLE2"
+        
+        LYRIC_CHECK=$(grep -i "We don't have lyrics for this song yet" "$LYRIC_FILE")
+        
+        if [[ -z "$LYRIC_CHECK" ]]; then
+            
+            printf '\n%s\n%s\n' "$TITLE1 - $ARTIST1" "$(cat "$LYRIC_FILE")" >"$LYRIC_FILE"
+            printf '\n' >> "$LYRIC_FILE"
+            stty size | perl -ale 'print "-"x$F[1]' >> "$LYRIC_FILE"
+            cat "$LYRIC_FILE"
+            
+            moc_check
+            
+        else
+            
+            echo ""
+            echo "$TITLE1 - $ARTIST1"
+            echo ""
+            echo "Sorry, We don't have lyrics for this song yet."
+            echo "You can make a contribution by adding this at,"
+            echo -e '\e[38;5;82m'"https://lyrics.wikia.com"
+            echo ""
+            tput sgr0
+            stty size | perl -ale 'print "-"x$F[1]'
+            
+            moc_check
+            
+        fi
+        
+    else
+        
+        moc_check
+    fi
+
+}
+
+while :
+do
+    moc_test
+done
