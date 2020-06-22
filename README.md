@@ -1,5 +1,5 @@
 # moc-lyrics
-moc-lyrics is a simple bash script that fetches the lyrics of current song playing in MOC (music on console) music player.
+moc-lyrics is a simple bash script that fetches the lyrics of current song playing in [MOC] (music on console) music player.
 
 
 ### Dependencies :
@@ -9,18 +9,39 @@ protocols. Most Linux distributions have Wget in their package repositories so y
 
 
 ### Installation :
-Very easy. Download [moc-lyrics-master.zip], extract it, and simply copy 'moc-lyrics' file to '/usr/local/bin/' directory,
- ```sh
-$ sudo cp moc-lyrics /usr/local/bin/
-```
-Next make it executable,
+Very easy.
+
+Obtain sudo privileges and download [moc-lyrics-master.zip],
+
 ```sh
-$ sudo chmod a+x /usr/local/bin/moc-lyrics
+sudo -s
+wget --content-disposition https://github.com/hakerdefo/moc-lyrics/archive/master.zip
+```
+
+Extract it,
+
+```sh
+unzip moc-lyrics-master.zip
+```
+
+Make **moc-lyrics** executable and copy it to **/usr/local/bin/** directory,
+
+ ```sh
+chmod 755 moc-lyrics-master/moc-lyrics
+cp moc-lyrics-master/moc-lyrics /usr/local/bin/
+```
+
+And finally clean up the leftovers and drop sudo privileges,
+
+```sh
+rm moc-lyrics-master.zip
+rm -rf moc-lyrics-master/
+exit
 ```
 
 
 ### Usage :
-Run moc-lyrics and it will fetch and print lyrics of the song currently playing in [MOC] music player.
+Run moc-lyrics and it will fetch and print lyrics of the song currently playing in MOC music player.
 
 
 ### Credits :
