@@ -44,6 +44,15 @@ exit
 Run moc-lyrics and it will fetch and print lyrics of the song currently playing in MOC music player.
 
 
+### Support :
+
+If you like **moc-lyrics**, please consider supporting it, even the smallest contribution goes a long way. It is quick & easy via PayPal, Buy Me a Coffee or Liberapay:  
+
+[![Support via PayPal](https://cdn.jsdelivr.net/gh/twolfson/paypal-github-button@1.0.0/dist/button.svg)](https://paypal.me/hakerdefo)  
+[!["Buy Me A Coffee"](https://user-images.githubusercontent.com/1376749/120938564-50c59780-c6e1-11eb-814f-22a0399623c5.png)](https://www.buymeacoffee.com/hakerdefo)  
+[![Support via Liberapay](https://liberapay.com/assets/widgets/donate.svg)](https://liberapay.com/hakerdefo/donate)  
+
+
 ### Credits :
 [Federico Builes] - moc-lyrics wouldn't have been possible without wonderful [makeitpersonal] created by Federico.
 
